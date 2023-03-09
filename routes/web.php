@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ElectionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +19,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/test', function (){
+    $start = '19:30';
+    //make full timestamp from start time
 
+    dd($start);
+});
 
 Route::middleware(['auth'])->group(function () {
 
@@ -37,6 +44,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/assign/{user}', 'assign_teacher')->name('user.assign_teacher');
     });
 
+    Route::controller(AttendanceController::class)->middleware(['auth'])->group(function () {
+        Route::get('/attendance', 'index')->name('attendance.index');
+        Route::post('/mark_attendance', 'mark_attendance')->name('user.mark_attendance');
+        Route::get('/get_attendance', 'get_attendance')->name('user.get_attendance');
+    });
+
     Route::resource('users', UsersController::class)->middleware(['admin']);
 
 });
@@ -45,3 +58,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::impersonate();
+
+Route::get('/webhook',function (Request $request){
+    app()->log->info('Meeting created successfully', ['meeting' => $meeting]);
+    return $request->hub_challenge;
+} );
